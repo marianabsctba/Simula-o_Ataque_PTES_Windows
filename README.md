@@ -42,3 +42,11 @@ Simulação completa de um fluxo de **pentest alinhado ao PTES (Penetration Test
 # Identidade e contexto
 whoami /all
 systeminfo | findstr /B /C:"OS Name" /C:"OS Version" /C:"System Type"
+
+### Ping sweep simples
+1..254 | ForEach-Object {
+  Test-Connection -ComputerName 192.168.56.$_ -Count 1 -Quiet -ErrorAction SilentlyContinue
+} | ForEach-Object {
+  "192.168.56.$_"
+}
+
