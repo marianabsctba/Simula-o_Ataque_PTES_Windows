@@ -28,7 +28,7 @@ Simulação completa de um fluxo de **pentest alinhado ao PTES (Penetration Test
 
 - **Atacante:** Windows 11 (PC ou VM)
 - **Vítima:** Windows 10/11 (VM)
-- **IP da vítima:** `192.168.56.101`
+- **IP da vítima:** `192.168.56.101` (escolha um adequado)
 - **Rede:** Interna (Host-Only ou NAT)
 - **Credenciais:** Usuário low-priv previamente obtido (phishing simulado, share etc.)
 
