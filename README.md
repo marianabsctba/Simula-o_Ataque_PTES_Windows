@@ -78,7 +78,7 @@ systeminfo | findstr /B /C:"OS Name" /C:"OS Version" /C:"System Type"
 
 ```powershell
 1..254 | ForEach-Object {
-  Test-Connection -ComputerName 192.168.56.$_ -Count 1 -Quiet -ErrorAction SilentlyContinue
+  Test-Connection -ComputerName IP.$_ -Count 1 -Quiet -ErrorAction SilentlyContinue
 } | ForEach-Object {
   "ip.$_"
 }
