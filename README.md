@@ -40,6 +40,7 @@ Se rodar isso fora de um lab → **não é pentest, é BO**.
 
 ---
 
+
 ## Ambiente de teste sugerido
 
 - **Atacante:** Windows 11 (PC ou VM)
