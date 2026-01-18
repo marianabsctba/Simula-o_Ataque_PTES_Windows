@@ -26,7 +26,7 @@ Resumo honesto:
 Se rodar isso fora de um lab → **não é pentest, é BO**.
 
 ---
-[Trilha sonora para acompanhar kkkkkk](https://www.youtube.com/watch?v=ProwCLCppgo&list=RDWgETDKFkDEE&index=9)
+<iframe width="560" height="315" src="https://www.youtube.com/watch?v=ProwCLCppgo&list=RDWgETDKFkDEE&index=9" title="Trilha Sonora para Acompanhar kkkkk" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
 ---
 
